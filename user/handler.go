@@ -5,6 +5,7 @@ import (
 	"go-locust/contrib"
 	"go-locust/dao"
 	"net/http"
+	"runtime"
 )
 
 type Req struct {
@@ -20,7 +21,7 @@ func CreateTask(ctx *gin.Context) {
 	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"参数有误或者格式不对": err})
 	}
-	err := dao.Create(req.ThreadCount, req.LoopCount, req.Method, req.Url, req.Body)
+	err := dao.CreateTask(req.ThreadCount, req.LoopCount, req.Method, req.Url, req.Body)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"err": err})
 	}
@@ -28,10 +29,15 @@ func CreateTask(ctx *gin.Context) {
 }
 
 func StartTask(ctx *gin.Context) {
+	num := runtime.NumGoroutine()
+	contrib.TaskQueue = make(chan dao.LocustTask)
 	taskId, _ := ctx.GetPostForm("task_id")
-	task := dao.Query(taskId)
-	go contrib.SendRequests(task)
-	ctx.JSON(http.StatusOK, gin.H{"msg": "start success"})
+	task := dao.QueryTask(taskId)
+	go contrib.InitLocust()
+	go func() {
+		contrib.TaskQueue <- task
+	}()
+	ctx.JSON(http.StatusOK, gin.H{"msg": "start success", "g": num})
 }
 
 func StopTask(ctx *gin.Context) {

@@ -14,7 +14,7 @@ type LocustTask struct {
 	LoopCount   int    `json:"loop_count"`
 }
 
-func Create(threadCount, loopCount int, method, url, body string) error {
+func CreateTask(threadCount, loopCount int, method, url, body string) error {
 	sql := "insert into locust_task (thread_count,method,url,body,loop_count)values (?,?,?,?,?)"
 	_, err := db.Conn.Exec(sql, threadCount, method, url, body, loopCount)
 	if err != nil {
@@ -23,7 +23,7 @@ func Create(threadCount, loopCount int, method, url, body string) error {
 	return nil
 }
 
-func Query(taskId string) (locustTask LocustTask) {
+func QueryTask(taskId string) (locustTask LocustTask) {
 	sql := "select * from locust_task where id = ?"
 	rows, err := db.Conn.Query(sql, taskId)
 	if err != nil {

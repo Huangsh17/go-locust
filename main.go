@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-locust/contrib"
 	"go-locust/db"
 	"go-locust/user"
 	"go-locust/util"
@@ -10,7 +11,8 @@ import (
 )
 
 func init() {
-	initLogger()
+	go initLogger()
+	go contrib.InitLocust()
 	db.RedisInit()
 	db.Connect()
 }
