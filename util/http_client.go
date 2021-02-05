@@ -11,11 +11,12 @@ type Method interface {
 	Post(url, body string) (string, error)
 }
 
-type HttpClient struct {
-}
+type HttpClient struct{}
+
+var Client = &http.Client{Transport: http.DefaultTransport}
 
 func (hc *HttpClient) Get(url string) (string, error) {
-	res, err := http.Get(url)
+	res, err := Client.Get(url)
 	if err != nil {
 		Sugar.Errorw("get requests fail ", "error", err)
 	}
@@ -26,7 +27,7 @@ func (hc *HttpClient) Get(url string) (string, error) {
 
 func (hc *HttpClient) Post(url string, body string) (string, error) {
 	contentType := "application/json"
-	resp, err := http.Post(url, contentType, strings.NewReader(body))
+	resp, err := Client.Post(url, contentType, strings.NewReader(body))
 	if err != nil {
 		Sugar.Errorw("post requests fail ", "error", err)
 	}

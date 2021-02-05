@@ -5,6 +5,8 @@ import (
 	"go-locust/db"
 	"go-locust/user"
 	"go-locust/util"
+
+	"github.com/gin-contrib/pprof"
 )
 
 func init() {
@@ -13,8 +15,8 @@ func init() {
 	db.Connect()
 }
 func main() {
-
 	g := gin.Default()
+	pprof.Register(g)
 	g.POST("/create_task", user.CreateTask)
 	g.POST("/start_task", user.StartTask)
 	g.POST("/stop_task", user.StopTask)
