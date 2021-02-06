@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"encoding/json"
 	"go-locust/db"
 	"go-locust/util"
 )
@@ -37,4 +38,13 @@ func QueryTask(taskId string) (locustTask LocustTask) {
 		}
 	}
 	return
+}
+
+func AddTask(lt LocustTask) {
+	conn := db.GetRedisConn()
+	res, _ := json.Marshal(lt)
+	_, err := conn.Do("LPUSH", "task", res)
+	if err != nil {
+		util.Sugar.Errorw("lpush fail", "error", err)
+	}
 }

@@ -2,26 +2,26 @@ package contrib
 
 import (
 	"context"
-	"fmt"
 	"go-locust/dao"
 	"go-locust/util"
 	"sync"
 )
 
 var (
-	http      *util.HttpClient
-	Cancel    context.CancelFunc
-	wg        sync.WaitGroup
+	http *util.HttpClient
+	_    context.CancelFunc
+	wg   sync.WaitGroup
+	// 本地单机任务队列
 	TaskQueue chan dao.LocustTask
 )
 
-func sendRequests(task dao.LocustTask, ctx context.Context) {
+func SendRequests(task dao.LocustTask, ctx context.Context) {
 	startTask(task, ctx)
 }
 
 func startTask(task dao.LocustTask, ctx context.Context) {
 	for i := 1; i <= task.LoopCount; i++ {
-		for j := 0; j <= task.ThreadCount; j++ {
+		for j := 1; j <= task.ThreadCount; j++ {
 			wg.Add(1)
 			go locust(task)
 		}
@@ -33,7 +33,6 @@ func locust(task dao.LocustTask) string {
 	switch task.Method {
 	case "get":
 		resp, _ := http.Get(task.Url)
-		fmt.Println(resp)
 		_ = dao.CreateResult(resp, task.ID)
 		wg.Done()
 		return resp
@@ -48,18 +47,14 @@ func locust(task dao.LocustTask) string {
 
 func InitLocust() {
 	ctx, cancel := context.WithCancel(context.Background())
-	Cancel = cancel
+	_ = cancel
 	for {
 		select {
 		case <-ctx.Done():
 			util.Sugar.Infow("goroutine quit")
 		case task := <-TaskQueue:
-			sendRequests(task, ctx)
+			SendRequests(task, ctx)
 			return
 		}
 	}
-}
-
-func StopTask() {
-	Cancel()
 }

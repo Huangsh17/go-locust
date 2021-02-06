@@ -14,7 +14,7 @@ var (
 )
 
 func Connect() {
-	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s", config.USER_MYSQL, config.PASSWORD_MYSQL, config.HOST_MYSQL, config.DB_NAME_MYSQL)
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true&loc=Local", config.USER_MYSQL, config.PASSWORD_MYSQL, config.HOST_MYSQL, config.DB_NAME_MYSQL)
 	conn, err := sql.Open("mysql", dataSourceName)
 	if err != nil {
 		util.Sugar.Errorw("mysql connection fail", "error", err)

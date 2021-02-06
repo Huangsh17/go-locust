@@ -2,26 +2,15 @@ package db
 
 import (
 	"github.com/gomodule/redigo/redis"
-	"os"
+	"go-locust/config"
 )
 
 var redisPool redis.Pool
 
-const DefaultRedisHost = "127.0.0.1:6379"
-
-func GetRedisHost() string {
-	var RedisHost = os.Getenv("REDIS_HOST")
-	if len(RedisHost) != 0 {
-		return DefaultRedisHost
-	}
-
-	return RedisHost
-}
-
 func RedisInit() {
 	redisPool = redis.Pool{
 		Dial: func() (conn redis.Conn, err error) {
-			return redis.Dial("tcp", GetRedisHost())
+			return redis.Dial("tcp", config.HOST_REDIS)
 		},
 		MaxIdle:         0,
 		MaxActive:       0,

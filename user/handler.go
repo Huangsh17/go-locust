@@ -5,10 +5,10 @@ import (
 	"go-locust/contrib"
 	"go-locust/dao"
 	"net/http"
-	"runtime"
+	"strconv"
 )
 
-type Req struct {
+type CreateTaskReq struct {
 	ThreadCount int    `form:"thread_count" json:"thread_count" binding:"required"`
 	Method      string `form:"method" json:"method" binding:"required"`
 	Url         string `form:"url" json:"url" binding:"required"`
@@ -16,8 +16,13 @@ type Req struct {
 	LoopCount   int    `form:"loop_count" json:"loop_count" binding:"required"`
 }
 
+type StartTaskReq struct {
+	TaskId               int `form:"task_id" json:"task_id" binding:"required"`
+	OperatingEnvironment int `form:"operating_environment" json:"operating_environment" binding:"required"`
+}
+
 func CreateTask(ctx *gin.Context) {
-	var req Req
+	var req CreateTaskReq
 	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"参数有误或者格式不对": err})
 	}
@@ -29,20 +34,28 @@ func CreateTask(ctx *gin.Context) {
 }
 
 func StartTask(ctx *gin.Context) {
-	num := runtime.NumGoroutine()
 	contrib.TaskQueue = make(chan dao.LocustTask)
-	taskId, _ := ctx.GetPostForm("task_id")
-	task := dao.QueryTask(taskId)
-	go contrib.InitLocust()
-	go func() {
-		contrib.TaskQueue <- task
-	}()
-	ctx.JSON(http.StatusOK, gin.H{"msg": "start success", "g": num})
+	var req StartTaskReq
+	if err := ctx.ShouldBind(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"参数有误或者格式不对": err})
+	}
+	task := dao.QueryTask(strconv.Itoa(req.TaskId))
+	switch req.OperatingEnvironment {
+	case 1:
+		go contrib.InitLocust()
+		go func() {
+			contrib.TaskQueue <- task
+		}()
+		ctx.JSON(http.StatusOK, gin.H{"msg": "start success"})
+	case 2:
+		dao.AddTask(task)
+		ctx.JSON(http.StatusOK, gin.H{"msg": "start success"})
+	default:
+	}
 }
 
 func StopTask(ctx *gin.Context) {
 	_, _ = ctx.GetPostForm("task_id")
-	contrib.StopTask()
 	ctx.JSON(http.StatusOK, gin.H{"msg": "stop success"})
 }
 
