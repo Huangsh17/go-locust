@@ -1,0 +1,5 @@
+package cluster
+
+func CheckClusterStatus() {
+
+}
