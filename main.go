@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-locust/cluster"
 	"go-locust/contrib"
 	"go-locust/db"
 	"go-locust/user"
@@ -15,6 +16,7 @@ func init() {
 	go contrib.InitLocust()
 	db.RedisInit()
 	db.Connect()
+	go cluster.HealthCheck()
 	//db.EtcdInit()
 }
 

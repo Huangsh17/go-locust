@@ -28,13 +28,13 @@ func init() {
 func main() {
 	getHostName()
 	go util.InitLog()
-	go run()
+	go worker()
 	go register()
-	go checkHeartbeat("")
+	go ReportHeartbeatData()
 	select {}
 }
 
-func getTask() {
+func worker() {
 	var locustTask dao.LocustTask
 	conn := db.GetRedisConn()
 	for {
@@ -56,20 +56,14 @@ func register() {
 	}
 }
 
-func checkHeartbeat(hostName string) {
-	ticker := time.NewTicker(1 * time.Second)
+func ReportHeartbeatData() {
+	conn := db.GetRedisConn()
+	ticker := time.NewTicker(3 * time.Second)
+	_, _ = conn.Do("SET", HostName+"_"+"heartbeat", 1)
 	for {
 		<-ticker.C
+		_, _ = conn.Do("INCR", HostName+"_"+"heartbeat")
 	}
-}
-
-func setCounter() {
-	conn := db.GetRedisConn()
-	_, _ = conn.Do("SET", HostName+"heartbeat")
-
-}
-func run() {
-	getTask()
 }
 
 func getHostName() {
