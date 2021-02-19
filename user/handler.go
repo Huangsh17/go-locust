@@ -48,6 +48,11 @@ func StartTask(ctx *gin.Context) {
 		}()
 		ctx.JSON(http.StatusOK, gin.H{"msg": "start success"})
 	case 2:
+		isEmpty := dao.IsEmptyQueue()
+		if isEmpty {
+			ctx.JSON(http.StatusOK, gin.H{"msg": "任务池里面有任务了，等压测完在添加"})
+			return
+		}
 		dao.AddTask(task)
 		ctx.JSON(http.StatusOK, gin.H{"msg": "start success"})
 	default:

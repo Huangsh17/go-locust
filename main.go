@@ -15,7 +15,7 @@ func init() {
 	go contrib.InitLocust()
 	db.RedisInit()
 	db.Connect()
-	db.EtcdInit()
+	//db.EtcdInit()
 }
 
 func main() {
