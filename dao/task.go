@@ -2,6 +2,7 @@ package dao
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-locust/db"
 	"go-locust/util"
 )
@@ -47,4 +48,14 @@ func AddTask(lt LocustTask) {
 	if err != nil {
 		util.Sugar.Errorw("lpush fail", "error", err)
 	}
+}
+
+func IsEmptyQueue() bool {
+	conn := db.GetRedisConn()
+	res, err := conn.Do("LLEN", "task")
+	if err != nil {
+		util.Sugar.Errorw("LLEN fail", "error", err)
+	}
+	fmt.Println(res)
+	return true
 }

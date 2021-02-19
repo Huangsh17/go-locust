@@ -26,11 +26,8 @@ func init() {
 }
 
 func main() {
-	name, err := os.Hostname()
-	if err != nil {
-		logger.Errorw("get hostname fail", "error", err)
-	}
-	HostName = name
+	getHostName()
+	go util.InitLog()
 	go run()
 	go register()
 	go checkHeartbeat("")
@@ -60,8 +57,7 @@ func register() {
 }
 
 func checkHeartbeat(hostName string) {
-
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(1 * time.Second)
 	for {
 		<-ticker.C
 	}
@@ -74,4 +70,12 @@ func setCounter() {
 }
 func run() {
 	getTask()
+}
+
+func getHostName() {
+	name, err := os.Hostname()
+	if err != nil {
+		logger.Errorw("get hostname fail", "error", err)
+	}
+	HostName = name
 }

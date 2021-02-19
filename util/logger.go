@@ -111,6 +111,11 @@ func DefaultLogger() *zap.SugaredLogger {
 	return InitLogger(logConfig)
 }
 
+func InitLog() {
+	logger := DefaultLogger()
+	Sugar = logger
+}
+
 // 日志业务流追踪，在需要追踪一个完整的业务流开始前调用，并并写道日志里面，比如：
 //ctx := TraceLogger()
 //util.Sugar.Infow("购物流程","traceId",ctx.Value("traceId"))

@@ -11,11 +11,13 @@ import (
 )
 
 func init() {
-	go initLogger()
+	go util.InitLog()
 	go contrib.InitLocust()
 	db.RedisInit()
 	db.Connect()
+	db.EtcdInit()
 }
+
 func main() {
 	g := gin.Default()
 	pprof.Register(g)
@@ -25,9 +27,4 @@ func main() {
 	g.GET("/task_list", user.TaskList)
 	g.GET("/test", user.TestApi)
 	_ = g.Run(":9999")
-}
-
-func initLogger() {
-	logger := util.DefaultLogger()
-	util.Sugar = logger
 }
