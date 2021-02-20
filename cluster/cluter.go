@@ -34,7 +34,7 @@ func check(key string) {
 			if err != nil {
 				util.Sugar.Errorw("SREM fail", "error", err)
 			}
-			util.Sugar.Infow("集群健康状态", "status", "不健康", "node", genSplit[0])
+			util.Sugar.Infow("集群健康状态", "status", "不健康,已从redis剔除该节点", "node", genSplit[0])
 			continue
 		}
 		initValue = count

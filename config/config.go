@@ -39,3 +39,9 @@ const (
 	USER_REDIS     = ""
 	PASSWORD_REDIS = ""
 )
+
+// etcd
+const (
+	HOST_ETCD = "127.0.0.1:6379"
+	USER_ETCD = ""
+)

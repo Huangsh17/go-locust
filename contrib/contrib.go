@@ -42,7 +42,7 @@ func locust(task dao.LocustTask) string {
 			util.Sugar.Errorw("get fail", "error", err)
 		}
 		util.Sugar.Infow("执行成功", "result", resp)
-		//_ = dao.CreateResult(resp, task.ID)
+		_ = dao.CreateResult(resp, task.ID)
 		wg.Done()
 		return resp
 	case "post":

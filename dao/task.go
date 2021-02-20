@@ -51,7 +51,6 @@ func AddTask(lt LocustTask) {
 			util.Sugar.Errorw("lpush fail", "error", err)
 		}
 	}
-
 }
 
 func GetHostName() []string {
