@@ -33,11 +33,13 @@ func locust(task dao.LocustTask) string {
 	switch task.Method {
 	case "get":
 		resp, _ := http.Get(task.Url)
+		util.Sugar.Infow("执行成功", "result", resp)
 		_ = dao.CreateResult(resp, task.ID)
 		wg.Done()
 		return resp
 	case "post":
 		resp, _ := http.Post(task.Url, task.Body)
+		util.Sugar.Infow("执行成功", "result")
 		_ = dao.CreateResult(resp, task.ID)
 		wg.Done()
 		return resp

@@ -12,9 +12,6 @@ import (
 	"time"
 )
 
-var (
-	Key = "task"
-)
 var HostName string
 
 var logger *zap.SugaredLogger
@@ -38,8 +35,8 @@ func worker() {
 	var locustTask dao.LocustTask
 	conn := db.GetRedisConn()
 	for {
-		logger.Infow("开始监听任务队列")
-		res, _ := conn.Do("BRPOP", Key, 0)
+		logger.Infow("开始监听任务队列", "queue", HostName)
+		res, _ := conn.Do("BRPOP", HostName+"_task", 0)
 		value, _ := res.([]interface{})
 		v, _ := value[1].([]byte)
 		_ = json.Unmarshal(v, &locustTask)

@@ -21,24 +21,24 @@ func HealthCheck() {
 }
 
 func check(key string) {
-	var initValue int = 0
+	var initValue int = 1
 	conn := db.GetRedisConn()
 	ticker := time.NewTicker(5 * time.Second)
+	genSplit := strings.Split(key, "_")
 	for {
 		<-ticker.C
 		countStr, _ := conn.Do("GET", key)
 		count, _ := strconv.Atoi(string(countStr.([]byte)))
 		if initValue == count {
-			genSplit := strings.Split(key, "_")
 			_, err := conn.Do("SREM", "cluster", genSplit[0])
 			if err != nil {
 				util.Sugar.Errorw("SREM fail", "error", err)
 			}
-			util.Sugar.Infow("集群健康状态", "status", "不健康", "node", key)
+			util.Sugar.Infow("集群健康状态", "status", "不健康", "node", genSplit[0])
 			continue
 		}
 		initValue = count
-		util.Sugar.Infow("集群健康状态", "status", "健康", "node", key)
+		util.Sugar.Infow("集群健康状态", "status", "健康", "node", genSplit[0])
 	}
 }
 

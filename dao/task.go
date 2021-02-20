@@ -43,10 +43,25 @@ func QueryTask(taskId string) (locustTask LocustTask) {
 func AddTask(lt LocustTask) {
 	conn := db.GetRedisConn()
 	res, _ := json.Marshal(lt)
-	_, err := conn.Do("LPUSH", "task", res)
-	if err != nil {
-		util.Sugar.Errorw("lpush fail", "error", err)
+	nodes := GetHostName()
+	for _, node := range nodes {
+		_, err := conn.Do("LPUSH", node+"_"+"task", res)
+		if err != nil {
+			util.Sugar.Errorw("lpush fail", "error", err)
+		}
 	}
+
+}
+
+func GetHostName() []string {
+	conn := db.GetRedisConn()
+	nodes := make([]string, 0)
+	reply, _ := conn.Do("SMEMBERS", "cluster")
+	values, _ := reply.([]interface{})
+	for _, value := range values {
+		nodes = append(nodes, string(value.([]byte)))
+	}
+	return nodes
 }
 
 func IsEmptyQueue() bool {

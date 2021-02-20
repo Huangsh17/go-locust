@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-locust/cluster"
 	"go-locust/contrib"
+	"go-locust/dao"
 	"go-locust/db"
 	"go-locust/user"
 	"go-locust/util"
@@ -17,6 +18,7 @@ func init() {
 	db.RedisInit()
 	db.Connect()
 	go cluster.HealthCheck()
+	go dao.GetHostName()
 	//db.EtcdInit()
 }
 
