@@ -24,6 +24,7 @@ func init() {
 
 func main() {
 	g := gin.Default()
+	g.Use(gin.Recovery())
 	pprof.Register(g)
 	g.POST("/create_task", user.CreateTask)
 	g.POST("/start_task", user.StartTask)

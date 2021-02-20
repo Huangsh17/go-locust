@@ -30,15 +30,26 @@ func startTask(task dao.LocustTask, ctx context.Context) {
 }
 
 func locust(task dao.LocustTask) string {
+	defer func() {
+		if err := recover(); err != nil {
+			util.Sugar.Errorw("请求异常", "error", err)
+		}
+	}()
 	switch task.Method {
 	case "get":
-		resp, _ := http.Get(task.Url)
+		resp, err := http.Get(task.Url)
+		if err != nil {
+			util.Sugar.Errorw("get fail", "error", err)
+		}
 		util.Sugar.Infow("执行成功", "result", resp)
-		_ = dao.CreateResult(resp, task.ID)
+		//_ = dao.CreateResult(resp, task.ID)
 		wg.Done()
 		return resp
 	case "post":
-		resp, _ := http.Post(task.Url, task.Body)
+		resp, err := http.Post(task.Url, task.Body)
+		if err != nil {
+			util.Sugar.Errorw("post fail", "error", err)
+		}
 		util.Sugar.Infow("执行成功", "result")
 		_ = dao.CreateResult(resp, task.ID)
 		wg.Done()
